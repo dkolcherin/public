@@ -2,9 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const ColorPicker = (props) => {
+  const onSelectedColorChanged = (color) => {
+    if (color !== props.selectedColor) {
+      props.onColorChanged(color)
+    }
+  };
+
   const renderColor = (color) => {
     return (
-      <div key={color} className="colorPicker-item" style={{backgroundColor: color}} onClick={() => props.onColorChanged(color)} />
+      <div key={color} className="colorPicker-item" style={{backgroundColor: color}} onClick={() => onSelectedColorChanged(color)} />
     );
   };
   
