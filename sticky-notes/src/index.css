@@ -1,0 +1,159 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+  height: 10px;
+	background-color: #F5F5F5;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: rgba(0,0,0,0.1);
+  border: 1px solid #ccc;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #e4e4e4;
+  border: 1px solid #aaa;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #fff;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: #a0a0a0;
+}
+
+.header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50px;
+  z-index: 1;
+
+  border-bottom: 1px solid #cacaca;
+  background-color: white;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.board-container {
+  margin-top: 50px;
+  position: relative;
+  height: calc(100vh - 50px);
+  overflow: auto;
+  min-height: 100%;
+  background-color: #f2f2f2;
+  z-index: 0;
+}
+
+.note-container {
+  border: 1px solid #cacaca;
+  position: absolute;
+  box-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+
+.note-header {
+  cursor: move;
+  height: 30px;
+  background-color: #000;
+  opacity: .1;
+}
+
+.note-colorPicker {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.note-resizeAnchor {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: nw-resize;
+  border: 5px solid transparent; 
+  border-right: 5px solid #3B0470; 
+  border-bottom: 5px solid #3B0470;
+}
+
+.note-textAreaContainer {
+  height: calc(100% - 30px);
+}
+
+.note-textContainer {
+  resize: none;
+  border: none;
+  width: calc(100% - 20px);
+  padding: 10px;
+  height: calc(100% - 20px);
+  font-size: 16px;
+}
+
+.note-textContainer:focus {
+  outline: none;
+}
+
+.colorPicker-container {
+  display: flex;
+  align-items: center;
+  background-color: #3B0470;
+  border-radius: 10px;
+  padding: 2px;
+}
+
+.colorPicker-item {
+  cursor: pointer;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 2px;
+}
+
+.trash-container {
+  position: fixed;
+  right: 10px;
+  top: 60px;
+  bottom: 10px;
+  background-color: lightgrey;
+  border: 2px dashed darkgrey;
+  border-radius: 10px;
+  opacity: .9;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trash-container h1 {
+  transform: rotate(90deg);
+}
+
+.app-saveDataButton {
+  position: absolute;
+  left: 10px;
+}
+
+.app-helpButton {
+  position: absolute;
+  right: 10px;
+}
