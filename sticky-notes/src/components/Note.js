@@ -4,10 +4,8 @@ import ColorPicker from "./ColorPicker";
 import NoteInfo from './../data/NoteInfo';
 
 const Note = (props) => {
-  const [top, setTop] = useState(props.noteInfo.top);
-  const [left, setLeft] = useState(props.noteInfo.left);
-  const [width, setWidth] = useState(props.noteInfo.width);
-  const [height, setHeight] = useState(props.noteInfo.height);
+  const [position, setPosition] = useState({top: props.noteInfo.top, left: props.noteInfo.left});
+  const [size, setSize] = useState({width: props.noteInfo.width, height: props.noteInfo.height});
   
   const updateNoteLayer = () => {
     const maxLayer = props.getMaxLayerValue();
@@ -31,12 +29,9 @@ const Note = (props) => {
   const changePositionOrSize = ({
     e, 
     x, y, 
-    setX, setY, 
-    calcX, calcY, 
-    minX = 0, minY = 0, 
-    maxX, maxY, 
-    mapForOutput, 
-    onBeforeAction, onAfterAction
+    onMouseMoveHandler,
+    changeNoteData,
+    onBeforeAction
   }) => {
     e.stopPropagation();
     updateNoteLayer();
@@ -55,25 +50,14 @@ const Note = (props) => {
     const onMouseMove = (e) => {
       e.preventDefault();
       const {pageX, pageY} = e;
-      x = getStateValue(calcX({pageX, offsetX}), minX, maxX);
-      y = getStateValue(calcY({pageY, offsetY}), minY, maxY);
-      setX(x);
-      setY(y);
+      ({x, y} = onMouseMoveHandler({offsetX, offsetY, pageX, pageY}));
     };
   
     const onMouseUp = (e) => {
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
       
-      const changedData = {
-        [mapForOutput["x"]]: x,
-        [mapForOutput["y"]]: y
-      };
-      props.onNoteChanged(changedData);
-
-      if (onAfterAction) {
-        onAfterAction({...props.noteInfo, ...changedData});
-      }
+      changeNoteData({x, y});
     };
     
     document.addEventListener("mousemove", onMouseMove);
@@ -85,26 +69,31 @@ const Note = (props) => {
 
   const onMoveStart = (e) => changePositionOrSize({
     e,
-    x: left, y: top,
-    setX: setLeft, setY: setTop,
-    calcX: ({pageX, offsetX}) => pageX - offsetX,
-    calcY: ({pageY, offsetY}) => pageY - offsetY + getFixYValue(),
-    minX: 10, minY: 10,
-    maxX: props.boardWidth - width - 12,
-    mapForOutput: { "x": "left", "y": "top" },
-    onBeforeAction: props.onNoteMoveStart,
-    onAfterAction: props.onNoteMoveEnd
+    x: position.left, y: position.top,
+    onMouseMoveHandler: ({offsetX, offsetY, pageX, pageY}) => {
+      const x = getStateValue(pageX - offsetX, 10, props.boardWidth - size.width - 12);
+      const y = getStateValue(pageY - offsetY + getFixYValue(), 10);
+      setPosition({top: y, left: x});
+      return {x, y};
+    },
+    changeNoteData: ({x,y}) => {
+      const changedData = { left: x, top: y };
+      props.onNoteChanged(changedData);
+      props.onNoteMoveEnd({...props.noteInfo, ...changedData});
+    },
+    onBeforeAction: props.onNoteMoveStart
   });
 
   const onResizeStart = (e) => changePositionOrSize({
     e,
-    x: width, y: height,
-    setX: setWidth, setY: setHeight,
-    calcX: ({pageX}) => pageX - left,
-    calcY: ({pageY}) => pageY - top + getFixYValue(),
-    minX: NoteInfo.minSize, minY: NoteInfo.minSize,
-    maxX: props.boardWidth - left - 12,
-    mapForOutput: { "x": "width", "y": "height" }
+    x: size.width, y: size.height,
+    onMouseMoveHandler: ({pageX, pageY}) => {
+      const x = getStateValue(pageX - position.left, NoteInfo.minSize, props.boardWidth - position.left - 12); 
+      const y = getStateValue(pageY - position.top + getFixYValue(), NoteInfo.minSize);
+      setSize({width: x, height: y});
+      return {x, y};
+    },
+    changeNoteData: ({x,y}) => props.onNoteChanged({ width: x, height: y })
   });
 
   const onNoteFieldChanged = (fieldName, value) => {
@@ -131,10 +120,8 @@ const Note = (props) => {
   const {text, noteColor, layer} = props.noteInfo;
 
   const style = { 
-    top, 
-    left, 
-    width, 
-    height, 
+    ...position,
+    ...size,
     backgroundColor: noteColor, 
     zIndex: layer 
   };

@@ -38,7 +38,7 @@ const App = () => {
 
   const onHelpButtonClick = () => {
     const text = 
-`Double-click on the board to create a new note!
+`Double-click on the board or draw a rectangle to create a new note!
 To move the note, grab it by the header area.
 To remove the note, move it to the "Trash" zone on the right.`;
     alert(text);
@@ -52,7 +52,6 @@ To remove the note, move it to the "Trash" zone on the right.`;
         <button className="app-helpButton" onClick={onHelpButtonClick}>?</button>
       </header>
       <Board notes={notes} 
-             dispatch={dispatch} 
              onNoteChanged={onNoteChanged}
              createNote={createNote}
              removeNote={removeNote}

@@ -157,3 +157,8 @@ button {
   position: absolute;
   right: 10px;
 }
+
+.board-newNote {
+  position: absolute;
+  background-color: #3B0470;
+}
