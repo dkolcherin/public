@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 
-const Trash = (props) => {
+const Trash: React.FC<CSSProperties> = (props) => {
   return (
     <div className="trash-container" style={props}>
       <h1>Trash</h1>

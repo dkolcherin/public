@@ -1,6 +1,26 @@
 const getUniqueId = () => Math.random().toString(36).substr(2);
 
-export default class NoteInfo {
+interface INoteInfo {
+  readonly id: string;
+  text: string;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  noteColor: string;
+  layer: number;
+}
+
+export default class NoteInfo implements INoteInfo {
+  readonly id;
+  text;
+  top;
+  left;
+  width;
+  height;
+  noteColor;
+  layer;
+
   constructor({
     id = getUniqueId(),
     text = "", 

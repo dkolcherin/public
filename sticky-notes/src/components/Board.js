@@ -83,6 +83,10 @@ const Board = (props) => {
   };
 
   const onBoardMouseDown = (e) => {
+    if (e.target !== containerRef.current) {
+      return;
+    }
+
     //is left button
     if (e.nativeEvent.which !== 1) {
       return;
@@ -116,12 +120,14 @@ const Board = (props) => {
     };
 
     const onMouseUp = (e) => {
-      createNewNoteInternal({
-        top,
-        left,
-        width: Math.abs(width),
-        height: Math.abs(height)
-      })
+      if (width > 0 && height > 0) {
+        createNewNoteInternal({
+          top,
+          left,
+          width: Math.abs(width),
+          height: Math.abs(height)
+        });
+      }
       setIsNewNoteCreation(false);
       setNewNoteSize({width: 0, height: 0});
       document.removeEventListener("mousemove", onMouseMove);
