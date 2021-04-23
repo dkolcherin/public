@@ -8,7 +8,6 @@
     "@testing-library/user-event": "^12.8.3",
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.41",
-    "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",

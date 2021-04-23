@@ -2,8 +2,9 @@ import { useReducer, useEffect } from 'react';
 import { noteActions, noteReducer } from "./reducers/noteReducer";
 import Board from './components/Board';
 import { API } from './data/API';
+import { IChangeNoteInfo } from './data/NoteInfo';
 
-const App = () => {
+const App: React.FC = () => {
   const [notes, dispatch] = useReducer(noteReducer, []);
 
   useEffect(() => {
@@ -20,23 +21,23 @@ const App = () => {
     }
   };
 
-  const loadNotes = () => {
+  const loadNotes = (): void => {
     dispatch({type: noteActions.LOAD_NOTES});
   };
 
-  const onNoteChanged = (id, data) => {
+  const onNoteChanged = (id: string, data: IChangeNoteInfo): void => {
     dispatch({type: noteActions.NOTE_CHANGED, id, data});
   };
 
-  const createNote = (data) => {
+  const createNote = (data: IChangeNoteInfo): void => {
     dispatch({type: noteActions.ADD_NOTE, data});
   };
 
-  const removeNote = (id) => {
+  const removeNote = (id: string): void => {
     dispatch({type: noteActions.REMOVE_NOTE, id});
   };
 
-  const onHelpButtonClick = () => {
+  const onHelpButtonClick = (): void => {
     const text = 
 `Double-click on the board or draw a rectangle to create a new note!
 To move the note, grab it by the header area.

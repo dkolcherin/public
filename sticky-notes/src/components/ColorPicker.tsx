@@ -1,14 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-const ColorPicker = (props) => {
-  const onSelectedColorChanged = (color) => {
+type ColorPickerProps = {
+  colors: string[],
+  selectedColor: string,
+  onColorChanged: (color: string) => void
+};
+
+const ColorPicker: React.FC<ColorPickerProps> = (props) => {
+  const onSelectedColorChanged = (color: string) => {
     if (color !== props.selectedColor) {
       props.onColorChanged(color)
     }
   };
 
-  const renderColor = (color) => {
+  const renderColor = (color: string) => {
     return (
       <div key={color} className="colorPicker-item" style={{backgroundColor: color}} onClick={() => onSelectedColorChanged(color)} />
     );
@@ -19,12 +24,6 @@ const ColorPicker = (props) => {
       {props.colors.map(renderColor)}
     </div>
   );
-};
-
-ColorPicker.propTypes = {
-  colors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  selectedColor: PropTypes.string,
-  onColorChanged: PropTypes.func.isRequired
 };
 
 export default ColorPicker;

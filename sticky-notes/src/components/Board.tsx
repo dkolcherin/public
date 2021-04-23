@@ -1,12 +1,18 @@
 import React, {useState, useRef, useEffect} from "react";
-import PropTypes from 'prop-types';
 import Note from "./Note";
-import NoteInfo from './../data/NoteInfo';
+import NoteInfo, { IChangeNoteInfo, INoteInfo } from './../data/NoteInfo';
 import Trash from './Trash';
 
 const trashWidth = 60;
 
-const Board = (props) => {
+type BoardProps = {
+  notes: INoteInfo[],
+  onNoteChanged: (id: string, data: IChangeNoteInfo) => void,
+  createNote: (data: IChangeNoteInfo) => void,
+  removeNote: (id: string) => void
+};
+
+const Board: React.FC<BoardProps> = (props) => {
   const [width, setWidth] = useState(0);
   const [isMoving, setIsMoving] = useState(false);
 
@@ -14,14 +20,15 @@ const Board = (props) => {
   const [newNotePosition, setNewNotePosition] = useState({top: 0, left: 0});
   const [newNoteSize, setNewNoteSize] = useState({width: 0, height: 0});
   
-  const containerRef = useRef();
-  const maxLayerValue = useRef();
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  const maxLayerValue = useRef<number>();
+  
   const {notes} = props;
 
   useEffect(() => {
-    const setBoardWidth = () => {
-      setWidth(containerRef.current.clientWidth);
+    const setBoardWidth = (): void => {
+      const container: any = containerRef.current;
+      setWidth(container.clientWidth);
     };
     setBoardWidth();
     window.addEventListener("resize", setBoardWidth);
@@ -30,7 +37,7 @@ const Board = (props) => {
     };
   }, []);
 
-  const getMaxLayerValue = (inc) => {
+  const getMaxLayerValue = (inc?: boolean): number => {
     if (typeof maxLayerValue.current === "undefined") {
       let max = 0;
       notes.forEach(n => {
@@ -46,7 +53,7 @@ const Board = (props) => {
     return maxLayerValue.current;
   };
 
-  const createNewNoteInternal = ({top, left, width, height}) => {
+  const createNewNoteInternal = ({top = 0, left = 0, width = 0, height = 0}: IChangeNoteInfo) => {
     const noteData = {
       top: Math.max(top, 10),
       left: Math.max(left, 10),
@@ -58,21 +65,22 @@ const Board = (props) => {
     props.createNote(noteData);
   };
 
-  const createNewNote = (e) => {
+  const createNewNote = (e: React.MouseEvent) => {
     let {offsetY: top, offsetX: left} = e.nativeEvent;
     if (left + NoteInfo.initialSize > width) {
       left = width - NoteInfo.initialSize;
     }
-    if (containerRef.current.scrollLeft) {
-      left += containerRef.current.scrollLeft;
+    const container: any = containerRef.current;
+    if (container.scrollLeft) {
+      left += container.scrollLeft;
     }
-    if (containerRef.current.scrollTop) {
-      top += containerRef.current.scrollTop;
+    if (container.scrollTop) {
+      top += container.scrollTop;
     }
     createNewNoteInternal({top, left, width: NoteInfo.initialSize, height: NoteInfo.initialSize});
   };
 
-  const onNoteMoveEnd = (noteInfo) => {
+  const onNoteMoveEnd = (noteInfo: INoteInfo): void => {
     //check if note is in "trash" zone
     if (noteInfo.left + noteInfo.width > width - 10 - trashWidth) {
       if (window.confirm("Do you want to remove this note?")) {
@@ -82,8 +90,9 @@ const Board = (props) => {
     setIsMoving(false);
   };
 
-  const onBoardMouseDown = (e) => {
-    if (e.target !== containerRef.current) {
+  const onBoardMouseDown = (e: React.MouseEvent): void => {
+    const container: any = containerRef.current;
+    if (e.target !== container) {
       return;
     }
 
@@ -101,7 +110,7 @@ const Board = (props) => {
     let top = 0;
     let left = 0;
 
-    const onMouseMove = (e) => {
+    const onMouseMove = (e: MouseEvent): void => {
       e.preventDefault();
       const {pageX, pageY} = e;
       width = pageX - initialX;
@@ -119,7 +128,7 @@ const Board = (props) => {
       });
     };
 
-    const onMouseUp = (e) => {
+    const onMouseUp = (e: MouseEvent): void => {
       if (width > 0 && height > 0) {
         createNewNoteInternal({
           top,
@@ -157,7 +166,7 @@ const Board = (props) => {
               onNoteChanged={(data) => props.onNoteChanged(n.id, data)}
               onNoteMoveStart={() => setIsMoving(true)}
               onNoteMoveEnd={onNoteMoveEnd}
-              containerElement={containerRef.current}
+              containerElement={containerRef.current as any}
         />
       ))}
       {isNewNoteCreation && 
@@ -166,13 +175,6 @@ const Board = (props) => {
       {isMoving && <Trash width={trashWidth} zIndex={getMaxLayerValue() - 1} />}
     </div>
   );
-};
-
-Board.propTypes = {
-  notes: PropTypes.array.isRequired,
-  onNoteChanged: PropTypes.func.isRequired,
-  createNote: PropTypes.func.isRequired,
-  removeNote: PropTypes.func.isRequired,
 };
 
 export default Board;

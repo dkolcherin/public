@@ -1,12 +1,12 @@
-import NoteInfo from './../data/NoteInfo';
+import NoteInfo, { IChangeNoteInfo, INoteInfo } from './../data/NoteInfo';
 
 const localStorageItemName = "notes";
 
-const saveToLocalStorage = (notes) => {
+const saveToLocalStorage = (notes: INoteInfo[]): void => {
   localStorage.setItem("notes", JSON.stringify(notes));
 };
 
-const loadFromLocalStorage = () => JSON.parse(localStorage.getItem(localStorageItemName) || "[]");
+const loadFromLocalStorage = (): INoteInfo[] => JSON.parse(localStorage.getItem(localStorageItemName) || "[]");
 
 export const noteActions = {
   NOTE_CHANGED: Symbol(),
@@ -15,7 +15,13 @@ export const noteActions = {
   REMOVE_NOTE: Symbol()
 };
 
-export function noteReducer(state, action) {
+type Action = {
+  type: symbol,
+  id?: string,
+  data?: INoteInfo | IChangeNoteInfo
+};
+
+export function noteReducer(state: INoteInfo[], action: Action) {
   switch(action.type) {
     case noteActions.LOAD_NOTES: {
       const newState = loadFromLocalStorage().map(n => new NoteInfo(n));
@@ -26,7 +32,7 @@ export function noteReducer(state, action) {
     case noteActions.ADD_NOTE: {
       const newState = [
         ...state,
-        new NoteInfo(action.data)
+        new NoteInfo(action.data || {})
       ];
       saveToLocalStorage(newState);
       return newState;

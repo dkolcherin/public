@@ -1,21 +1,53 @@
 import React, {useState} from "react";
-import PropTypes from "prop-types";
 import ColorPicker from "./ColorPicker";
-import NoteInfo from './../data/NoteInfo';
+import NoteInfo, { INoteInfo } from './../data/NoteInfo';
 
-const Note = (props) => {
+type NoteProps = {
+  boardWidth: number,
+  noteInfo: INoteInfo,
+  getMaxLayerValue: (inc?: boolean) => number,
+  onNoteChanged: (data: object) => void,
+  onNoteMoveStart: () => void,
+  onNoteMoveEnd: (data: INoteInfo) => void,
+  containerElement: HTMLDivElement
+};
+
+type Coordinates = {
+  x: number,
+  y: number
+};
+
+type MouseMoveHandlerArguments = {
+  pageX: number,
+  pageY: number,
+  offsetX?: number,
+  offsetY?: number
+};
+
+type ChangePositionOrSizeArguments = {
+  e: React.MouseEvent,
+  x: number,
+  y: number,
+  onMouseMoveHandler: (data: MouseMoveHandlerArguments) => Coordinates,
+  changeNoteData: (cord: Coordinates) => void,
+  onBeforeAction?: () => void
+};
+
+const Note: React.FC<NoteProps> = (props) => {
   const [position, setPosition] = useState({top: props.noteInfo.top, left: props.noteInfo.left});
   const [size, setSize] = useState({width: props.noteInfo.width, height: props.noteInfo.height});
   
-  const updateNoteLayer = () => {
+  const updateNoteLayer = (): void => {
     const maxLayer = props.getMaxLayerValue();
     if (props.noteInfo.layer < maxLayer) {
-      onNoteFieldChanged("layer", props.getMaxLayerValue(true));
+      props.onNoteChanged({
+        layer: props.getMaxLayerValue(true)
+      });
     }
   };
 
   //chech newValue against bounds
-  const getStateValue = (newValue, lowerLimit, upperLimit) => {
+  const getStateValue = (newValue: number, lowerLimit: number, upperLimit?: number): number => {
     if (typeof lowerLimit !== "undefined" && newValue < lowerLimit) {
       newValue = lowerLimit;
     }
@@ -32,7 +64,7 @@ const Note = (props) => {
     onMouseMoveHandler,
     changeNoteData,
     onBeforeAction
-  }) => {
+  }: ChangePositionOrSizeArguments): void => {
     e.stopPropagation();
     updateNoteLayer();
     
@@ -47,13 +79,13 @@ const Note = (props) => {
 
     const {offsetX, offsetY} = e.nativeEvent;
 
-    const onMouseMove = (e) => {
+    const onMouseMove = (e: MouseEvent): void => {
       e.preventDefault();
       const {pageX, pageY} = e;
       ({x, y} = onMouseMoveHandler({offsetX, offsetY, pageX, pageY}));
     };
   
-    const onMouseUp = (e) => {
+    const onMouseUp = (e: MouseEvent): void => {
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mouseup", onMouseUp);
       
@@ -67,12 +99,12 @@ const Note = (props) => {
   const headerHeight = 50;
   const getFixYValue = () => props.containerElement.scrollTop - headerHeight;
 
-  const onMoveStart = (e) => changePositionOrSize({
+  const onMoveStart = (e: React.MouseEvent): void => changePositionOrSize({
     e,
     x: position.left, y: position.top,
     onMouseMoveHandler: ({offsetX, offsetY, pageX, pageY}) => {
-      const x = getStateValue(pageX - offsetX, 10, props.boardWidth - size.width - 12);
-      const y = getStateValue(pageY - offsetY + getFixYValue(), 10);
+      const x = getStateValue(pageX - (offsetX || 0), 10, props.boardWidth - size.width - 12);
+      const y = getStateValue(pageY - (offsetY || 0) + getFixYValue(), 10);
       setPosition({top: y, left: x});
       return {x, y};
     },
@@ -84,7 +116,7 @@ const Note = (props) => {
     onBeforeAction: props.onNoteMoveStart
   });
 
-  const onResizeStart = (e) => changePositionOrSize({
+  const onResizeStart = (e: React.MouseEvent): void => changePositionOrSize({
     e,
     x: size.width, y: size.height,
     onMouseMoveHandler: ({pageX, pageY}) => {
@@ -96,24 +128,22 @@ const Note = (props) => {
     changeNoteData: ({x,y}) => props.onNoteChanged({ width: x, height: y })
   });
 
-  const onNoteFieldChanged = (fieldName, value) => {
-    if (value === props.noteInfo[fieldName]) {
-      return;
-    }
+  const onTextChanged = (e: React.FormEvent<HTMLTextAreaElement>): void => {
     props.onNoteChanged({
-      [fieldName]: value
+      text: e.currentTarget.value
     });
   };
 
-  const onTextChanged = (e) => {
-    onNoteFieldChanged("text", e.target.value);
+  const onNoteColorChanged = (color: string): void => {
+    if (color === props.noteInfo.noteColor) {
+      return;
+    }
+    props.onNoteChanged({
+      noteColor: color
+    });
   };
 
-  const onNoteColorChanged = (color) => {
-    onNoteFieldChanged("noteColor", color);
-  };
-
-  const onNoteClick = (e) => {
+  const onNoteClick = (e: React.MouseEvent): void => {
     updateNoteLayer();
   };
 
@@ -149,16 +179,6 @@ const Note = (props) => {
       </div>
     </div>
   );
-};
-
-Note.propTypes = {
-  boardWidth: PropTypes.number.isRequired,
-  noteInfo: PropTypes.object.isRequired,
-  getMaxLayerValue: PropTypes.func.isRequired,
-  onNoteChanged: PropTypes.func.isRequired,
-  onNoteMoveStart: PropTypes.func.isRequired,
-  onNoteMoveEnd: PropTypes.func.isRequired,
-  containerElement: PropTypes.object.isRequired
 };
 
 export default Note;

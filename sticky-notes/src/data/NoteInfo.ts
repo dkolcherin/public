@@ -1,6 +1,16 @@
 const getUniqueId = () => Math.random().toString(36).substr(2);
 
-interface INoteInfo {
+export interface IChangeNoteInfo {
+  text?: string;
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
+  noteColor?: string;
+  layer?: number;
+}
+
+export interface INoteInfo {
   readonly id: string;
   text: string;
   top: number;
