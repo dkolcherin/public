@@ -129,7 +129,7 @@ const Board: React.FC<BoardProps> = (props) => {
     };
 
     const onMouseUp = (e: MouseEvent): void => {
-      if (width > 0 && height > 0) {
+      if (width !== 0 && height !== 0) {
         createNewNoteInternal({
           top,
           left,
